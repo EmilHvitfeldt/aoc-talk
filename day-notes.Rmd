@@ -1,0 +1,213 @@
+---
+title: "Solution Noes"
+author: "Emil Hvitfeldt"
+output: html_document
+---
+
+This document is my notes on what each problem is about, how I solved it, and what other ways it could be solved. If possible I also try to note that changes between part 1 and part 2.
+
+# Peoples comments
+https://twitter.com/hrbrmstr/status/1467800673739755524
+
+# Day 1
+
+Part 1: Given a list of numbers, find  how many numbers are larger than last number
+Part 2: Same as before but for rolling sums of length 3
+
+This one is fairly simple in R. There wasn't a lot of difference approaches today since it is a fairly simple task
+
+You can use zoo::rollsum(), but there is also a trick because since we have common numbers between comparinsins we can do `diff(lag=3)` to get the same results.
+
+Reddit:
+https://old.reddit.com/r/adventofcode/comments/r66vow/2021_day_1_solutions/?sort=confidence
+
+There are weird ones:
+
+regex:
+^(?![0-9]([0-9](?:\n|(?-1))[0-9]?)$)(?:([0-9]*)(?:0\N*(?=\n\2[1-9])|1\N*(?=\n\2[2-9])|2\N*(?=\n\2[3-9])|3\N*(?=\n\2[4-9])|4\N*(?=\n\2[5-9])|5\N*(?=\n\2[6-9])|6\N*(?=\n\2[7-9])|7\N*(?=\n\2[89])|8\N*(?=\n\2[9]))|(?=([0-9](?:\n|(?-1))[0-9])[0-9]))
+^(?![0-9]([0-9](?:\n|(?-1))[0-9]?)$)(?:([0-9]*)(?:0\N*(?=\n\N+\n\N+\n\2[1-9])|1\N*(?=\n\N+\n\N+\n\2[2-9])|2\N*(?=\n\N+\n\N+\n\2[3-9])|3\N*(?=\n\N+\n\N+\n\2[4-9])|4\N*(?=\n\N+\n\N+\n\2[5-9])|5\N*(?=\n\N+\n\N+\n\2[6-9])|6\N*(?=\n\N+\n\N+\n\2[7-9])|7\N*(?=\n\N+\n\N+\n\2[89])|8\N*(?=\n\N+\n\N+\n\2[9]))|(?=([0-9](?:\n\N+\n\N+\n|(?-1))[0-9])[0-9]))
+
+You can also do a simple for loop for this one
+
+tidyverse:
+https://twitter.com/delaBJL/status/1466042033341177869
+
+Vizualizations:
+https://twitter.com/tw0handt0uch1/status/1467666586983022595
+
+# Day 2
+
+You are giving forward/down/up directions, and you need to calculate how far the submarine has traveled.
+Part 1 and part 2 gives different meaning to each of the 3 actions.
+
+This one happened to be easily solvable in both loops and tidy.
+loops tends to be a more general approach forr questions like this one, as it is not clear if part 2 will introduce some interdependence between the parameters
+
+I did a simple for loop, with if statements in them corresponding to each action. Same idea for part 1 and 2 just different codes for each action.
+
+This one is also fairly easy to do if you use tidyverse
+seperate, mutate and count should do the trick. sum/cumsum
+https://tanho63.github.io/advent_of_code/2021/day-02
+https://twitter.com/drob/status/1466465087108100101?s=20
+
+This one is one of the ones where you can fix the input to be a run-able expression and parse it
+
+```{r}
+TJ Mahr
+for part 2, I got to do my favorite AOC strategy: convert the input into R commands and just run R on them.
+f02b_find_aimed_submarine_product <- function(x) {
+  code <- x
+  r_code <- gsub("(\\w+) (\\d+)", "\\1(\\2)", code)
+
+  x <- 0
+  y <- 0
+  aim <- 0
+  down <- function(d) {
+    aim <<- aim + d
+    c(x, y, aim)
+  }
+  up <- function(d) down(-1 * d)
+  forward <- function(d) {
+    y <<- y + d * aim
+    x <<- x + d
+    c(x, y, aim)
+  }
+
+  source(exprs = parse(text = r_code), local = TRUE)
+  x * y
+}
+```
+
+Excotic languages:
+https://old.reddit.com/r/adventofcode/comments/r6zd93/2021_day_2_solutions/hmyh4u1/
+
+# Day 3
+
+You get a grid of 0/1s. You will use these to generate rates, which are represented as binary values
+Part 1: Create the values by taking the most/least common of each digit per col.
+Part 2: An iterative approach where the rows are filtered until you are left with a final number. Again based on the presence of 0/1 in the rows.
+
+I turned this into a matrix immediately and used that. Used apply for part 1, and a loop with break for part 2. Keeping a updating logical vector for eligible rows.
+I noticed that the rates for each part didn't differ by more than min/max and the tie value 0/1. So I created a function that took min/max as a argument to simplify the code.
+
+This one bit a lot of people who were trying to do it in tidyverse. Many had to give up for part 2.
+
+I didn't do it but colMeans() was king for part 1.
+
+This solution could also be gotten using purrr::reduce() with a purrr::done().
+https://twitter.com/drob/status/1466753069027311626
+
+stringi solution
+https://twitter.com/hrbrmstr/status/1466762005499584513
+
+A trick for part 1 was that the rates are oppisite each other.
+
+# Day 4
+
+You played bingo! You had a series of numbers, and 100 bingo plates.
+Part 1: Which plate won first?
+Part 2: Which plate won last?
+
+This problem, had a lot going for it. There was 2 big parts to this. Parsing the data. And detect if a plate had won. (reading was important as diagonal matches didn't count for this problem)
+
+I'm happy with my solution for this day. I was able to get the bingo plates into a list of integer matrices.
+
+This I wrote a function that took a plate and called the numbers one by 1 until it won and returned how long it took. Then mapped over all the boards.
+
+This proved fruitful since it gave me part 2 for free.
+
+the other way this could have been done would be to play all the baords at once waiting for one to win. This would have been harder to deal with part 2.
+
+This input could also have been read in as a array, and use apply() (I'm not super comfortable with arrays as I forget which index I use.)
+
+Checking if boards are winning could be done in many different ways. Nothing obviously better.
+
+tidyverse
+https://twitter.com/drob/status/1467157923512127488
+
+Motorola 68000 assembly (On a Sega MegaDrive)
+https://old.reddit.com/r/adventofcode/comments/r8i1lq/2021_day_4_solutions/hn8wxd8/
+
+Gif:
+https://twitter.com/Sol_HSA/status/1467033308177514496
+
+# Day 5
+
+Given input of pair of coordinates. 
+Part 2: Find number of overlapping grid points
+Part 1: Same as 2, but not diagonal.
+
+Parsing this one is a bit of a challange. Both separrate and extract() are good options here.
+
+This one could be handled in different ways. You might go the matrix route the first time around, But there is a couple of pitfalls. The grid starts at (0,0), so you need to adjust it if you go that way
+
+It can also be handled tidy and sparsely by creating the points the lines touch and count them up
+
+# Day 6
+
+Given a set of lanturn fish, calculate how many will be there after
+Part 1: 80 days
+Part 2: 256
+
+This is the first question where the naive solution for part 1 doesn't work for part 2.
+
+You can grow a vector of fish, and that will work fairly well for the first part. But it will come crashing down for part 2. I saw someone use 400GB of RAM.
+
+I went to use count of fish at each stage of pregnancy. this was efficient.
+
+matrix apprach (drob) (leslie matrix)
+
+integer64 approach?
+Which is I just counted how many fish got created by a fish that started at 0, then 1, etc, then did some multiplication
+Doesn't fit in 
+
+https://old.reddit.com/r/adventofcode/comments/r9z49j/2021_day_6_solutions/hnfna50/
+
+# Day 7
+
+Align crabs at same horizontal position
+Part 1: Minimize abs distance travelled
+Part 2: Minimize triangle abs sume travelled
+
+This can both be done by trying all values (fast)
+
+But there is also a trick where the optimal horizontal position is mean for part 1, and min(floor(mean()), ceiling(mean())) for part 2
+
+# Day 8
+
+You are given strambled segment code for a digital clock.
+Part 1: Detect how many digits 1, 4, 7, or 8 appear?
+Part 2: Decode the digits
+
+This one doesn't give you much overlapping code between part 1 and part 2.
+
+This one is the first one where it takes some time to solve it. Many took a long long time
+
+Part 1 here serves as a hint on how you could solve part 2.
+
+There are at least 3 ways I saw you could do this.
+
+My solution was you deduce which digit was which given the known ones. One of the fastest runtimes
+
+Look at all combinaitions
+https://twitter.com/drob/status/1468631001077329926
+
+Cool matrix solution
+https://twitter.com/just_add_data/status/1468803389068910597/photo/1
+
+Different approach
+https://old.reddit.com/r/adventofcode/comments/rc5s3z/2021_day_8_part_2_a_simple_fast_and_deterministic/
+
+# Day 9
+
+Part 1: Find low points in grid of numbers
+Part 2: Find size of the "basin"s that flow to each of these low points
+
+I went with loops for part 1, and BFS for part 2.
+
+"I went with using {igraph} to identify the connected components in the graph defined by neighbors without 9s"
+https://github.com/czeildi/advent-of-code/blob/main/solutions_2021/day09.R
+
+gif
+https://twitter.com/Awong234/status/1469025322813337605
+
