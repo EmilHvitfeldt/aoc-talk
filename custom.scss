@@ -1,0 +1,27 @@
+/*-- scss:defaults --*/
+
+$body-bg: #0f0f23;
+$body-color: #cccccc;
+$presentation-heading-color: #ffffff;
+$font-family-sans-serif: "Source Code Pro", monospace;
+$link-color: #00cc00;
+
+/*-- scss:rules --*/
+
+.reveal .slide blockquote {
+  border-left: 3px solid $text-muted;
+  padding-left: 0.5em;
+}
+
+.reveal .slide .green {
+  color: #00cc00;
+}
+
+.reveal .slide .darkgreen {
+  color: #009900;
+}
+
+.reveal .slide .glow {
+  color: #ffffff;
+  text-shadow: 0 0 5px #ffffff;
+}

@@ -1,0 +1,509 @@
+---
+title: "I did 'Advent of Code' and here is what I learned"
+author: "Emil Hvitfeldt"
+format:
+  revealjs: 
+    theme: [default, custom.scss]
+---
+
+##  {background-image="images/tree-empty.png" background-size="contain"}
+
+::: {.notes}
+Slide 1 / 40
+:::
+
+##  {background-image="images/example.png" background-size="contain"}
+
+::: {.notes}
+Slide 2 / 40
+:::
+
+##  {background-image="images/example-story.png" background-size="contain"}
+
+::: {.notes}
+Slide 3 / 40
+:::
+
+##  {background-image="images/example-problem.png" background-size="contain"}
+
+::: {.notes}
+Slide 4 / 40
+:::
+
+##  {background-image="images/example-test.png" background-size="contain"}
+
+::: {.notes}
+Slide 5 / 40
+:::
+
+##  {background-image="images/one-to-many.png" background-size="contain"}
+
+::: {.notes}
+Slide 6 / 40
+:::
+
+##  {background-image="images/time.gif" background-size="cover"}
+
+::: {.notes}
+Slide 7 / 40
+:::
+
+# 2020 December 1st
+
+::: {.notes}
+Slide 8 / 40
+:::
+
+# Find the two entries that sum to 2020
+
+::: {.notes}
+Slide 9 / 40
+:::
+
+# My Solution
+
+```{r, echo=TRUE, eval=FALSE}
+input <- as.numeric(readLines("01-input"))
+
+sum2 <- function(input, target) {
+  for (i in input) for (j in input) if (i + j == target) return(i * j)
+}
+
+sum2(input, 2020)
+```
+
+::: {.notes}
+Slide 10 / 40
+:::
+
+# 502 Bad Gateway 🔥🔥🔥
+
+::: {.notes}
+Slide 11 / 40
+:::
+
+# Possible Approaches
+
+::: incremental
+-   loops
+-   expand.grid
+-   sample
+-   Rockstar
+:::
+
+::: {.notes}
+Slide 12 / 40
+:::
+
+------------------------------------------------------------------------
+
+::: {style="font-size:14pt;"}
+The goal is to extinguish my desparation\
+Knock the goal down
+
+The enemy are accountants\
+Knock the enemy down
+
+The system is the enemy\
+The machine is the enemy
+
+Listen to the money\
+Until the money is gone\
+Cast the money into the fire\
+Let the rage at the enemy be the fire\
+Build the enemy up\
+Listen to the money
+
+While the enemy is higher than the system\
+Let chaos be the rage at the system\
+Let destruction be the rage at the machine\
+If the goal is chaos with destruction\
+Break it down
+
+Build the machine up\
+If the enemy is higher than the machine\
+Take it to the top
+
+Build the system up\
+The machine is the system
+
+Shout chaos of destruction
+:::
+
+::: aside
+::: {style="font-size:14pt;"}
+https://old.reddit.com/r/adventofcode/comments/k4e4lm/2020_day_1\_solutions/ge8uwqi/
+:::
+:::
+
+::: {.notes}
+Slide 13 / 40
+:::
+
+# Types of problems
+
+-   recursive
+-   Grid based
+-   parsable
+
+::: {.notes}
+Slide 14 / 40
+:::
+
+## Parsable Solutions
+
+::: columns
+::: {.column width="50%"}
+```{r, eval=FALSE, echo=TRUE}
+forward 2
+down 4
+down 3
+up 4
+down 1
+down 8
+up 9
+forward 1
+down 9
+forward 6
+down 7
+forward 1
+down 1
+up 2
+forward 8
+down 3
+down 9
+down 3
+```
+:::
+
+::: {.column width="50%"}
+:::
+:::
+
+::: {.notes}
+Slide 15 / 40
+:::
+
+## Parsable Solutions
+
+::: columns
+::: {.column width="50%"}
+```{r, eval=FALSE, echo=TRUE}
+forward(2)
+down(4)
+down(3)
+up(4)
+down(1)
+down(8)
+up(9)
+forward(1)
+down(9)
+forward(6)
+down(7)
+forward(1)
+down(1)
+up(2)
+forward(8)
+down(3)
+down(9)
+down(3)
+```
+:::
+
+::: {.column width="50%"}
+-   modify the input
+
+::: incremental
+-   define `forward()`, `down()` and `up()`
+-   run `eval(parse(text = input))`
+-   ...
+-   profit
+:::
+:::
+:::
+
+::: {.notes}
+Slide 16 / 40
+:::
+
+# memory exhausted (limit reached)
+
+::: {.notes}
+Slide 17 / 40
+:::
+
+## Lanternfish
+
+Initial state: 3,4,3,1,2\
+
+::: {.notes}
+Slide 18 / 40
+:::
+
+## Lanternfish
+
+Initial state: 3,4,3,1,2\
+After  1 day:  2,3,2,[0]{.green},1\
+
+::: {.notes}
+Slide 19 / 40
+:::
+
+## Lanternfish
+
+Initial state: 3,4,3,1,2\
+After  1 day:  2,3,2,[0]{.green},1\
+After  2 days: 1,2,1,[6]{.darkgreen},0,[8]{.glow}\
+
+::: {.notes}
+Slide 20 / 40
+:::
+
+## Lanternfish
+
+Initial state: 3,4,3,1,2\
+After  1 day:  2,3,2,[0]{.green},1\
+After  2 days: 1,2,1,[6]{.darkgreen},0,[8]{.glow}\
+After  3 days: [0]{.green},1,[0]{.green},5,6,7,[8]{.glow}\
+After  4 days: [6]{.darkgreen},[0]{.green},[6]{.darkgreen},4,5,6,7,[8]{.glow},[8]{.glow}\
+After  5 days: 5,[6]{.darkgreen},5,3,4,5,6,7,7,[8]{.glow}\
+After  6 days: 4,5,4,2,3,4,5,6,6,7\
+After  7 days: 3,4,3,1,2,3,4,5,5,6\
+After  8 days: 2,3,2,[0]{.green},1,2,3,4,4,5\
+After  9 days: 1,2,1,[6]{.darkgreen},[0]{.green},1,2,3,3,4,[8]{.glow}\
+After 10 days: [0]{.green},1,0,5,[6]{.darkgreen},0,1,2,2,3,7,[8]{.glow}
+
+::: {.notes}
+Slide 21 / 40
+:::
+
+## Lanternfish
+
+### Part 1
+
+[How many lanternfish would there be after 80 days?]{.glow}
+
+::: {.notes}
+Slide 22 / 40
+:::
+
+## Lanternfish
+
+### Part 1
+
+How many lanternfish would there be after 80 days?
+
+### Part 2
+
+[How many lanternfish would there be after 256 days?]{.glow}
+
+::: {.notes}
+Slide 23 / 40
+:::
+
+## Lanternfish
+
+### Part 1
+
+How many lanternfish would there be after 80 days? [\~1.5 MB]{.glow}
+
+### Part 2
+
+How many lanternfish would there be after 256 days?
+
+::: {.notes}
+Slide 24 / 40
+:::
+
+## Lanternfish
+
+### Part 1
+
+How many lanternfish would there be after 80 days? [\~1.5 MB]{.glow}
+
+### Part 2
+
+How many lanternfish would there be after 256 days? [\~6.58 TB]{.glow}
+
+::: {.notes}
+Slide 25 / 40
+:::
+
+## General workflow
+
+::: columns
+::: {.column width="50%"}
+-   [reading in data]{.glow}
+
+-   doing calculations
+
+-   unit tests
+
+-   Solution
+:::
+
+::: {.column width="50%"}
+- {readr}
+- `data.table::fread()`
+- {jsonlite}
+- `read_parquet()`
+:::
+
+:::
+
+::: {.notes}
+Slide 26 / 40
+:::
+
+## General workflow
+
+::: columns
+::: {.column width="50%"}
+-   reading in data
+
+-   [doing calculations]{.glow}
+
+-   unit tests
+
+-   Solution
+:::
+
+::: {.column width="50%"}
+- vectors
+- matrices
+- data.frames
+- lists
+:::
+
+:::
+
+::: {.notes}
+Slide 27 / 40
+:::
+
+## General workflow
+
+-   reading in data
+
+-   doing calculations
+
+-   [unit tests]{.glow}
+
+-   Solution
+
+::: {.notes}
+Slide 28 / 40
+:::
+
+## General workflow
+
+-   reading in data
+
+-   doing calculations
+
+-   unit tests
+
+-   [Solution]{.glow}
+
+::: {.notes}
+Slide 29 / 40
+:::
+
+# You might learn something
+
+::: {.notes}
+Slide 30 / 40
+:::
+
+---
+
+## Ways you can play this game
+
+::: incremental
+-   You can go for speed
+-   shortest solution
+-   no dependencies
+-   try another language
+:::
+
+::: {.notes}
+Slide 31 / 40
+:::
+
+---
+
+##  {background-image="images/speed.gif" background-size="cover"}
+
+::: {.notes}
+Slide 32 / 40
+:::
+
+---
+
+##  {background-image="images/drob-dominate.png" background-size="contain"}
+
+::: {.notes}
+Slide 33 / 40
+:::
+
+# go at your own phase
+
+::: {.notes}
+Slide 34 / 40
+:::
+
+##  {background-image="images/private-dashboard.png" background-size="contain"}
+
+::: {.notes}
+Slide 35 / 40
+:::
+
+##  {background-image="images/tanho.png" background-size="contain"}
+
+::: {.notes}
+Slide 36 / 40
+:::
+
+# The R community is awesome!
+
+::: {.notes}
+Slide 37 / 40
+:::
+
+---
+
+## Many different problems
+
+::: incremental
+- Squares With Three Sides (2016 day 3)
+- Encoding Error (2020 day 9)
+- Wizard Simulator 20XX (2015 day 22)
+:::
+
+::: {.notes}
+Slide 38 / 40
+
+Encoding error: first number in the list (after the preamble) which is not the sum of two of the 25 numbers before it.
+:::
+
+---
+
+## the problems are CLEARLY written
+
+::: {.notes}
+Slide 39 / 40
+:::
+
+---
+
+# Take home
+
+::: incremental
+- You might learn something
+- Join the Community
+- Have fun!
+:::
+
+::: {.notes}
+Slide 40 / 40
+:::
